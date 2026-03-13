@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中風衛教資料整合系統</title>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h3 {
+            color: #34495e;
+            margin-bottom: 15px;
+        }
+        .info-section {
+            background-color: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #d1e8ee;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: inline-block;
+            width: 80px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .input-group input[type="text"] {
+            width: calc(100% - 100px);
+            padding: 8px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .checkbox-group {
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        .checkbox-group label {
+            display: block;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #status {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>中風衛教資料整合系統</h2>
+    
+    <div class="info-section">
+        <h3>1. 輸入病患資訊</h3>
+        <div class="input-group">
+            <label for="bedNum">病房床號</label>
+            <input type="text" id="bedNum" placeholder="例如：10A-01">
+        </div>
+        <div class="input-group">
+            <label for="mrn">病歷號</label>
+            <input type="text" id="mrn" placeholder="例如：12345678">
+        </div>
+        <div class="input-group">
+            <label for="patientName">姓名</label>
+            <input type="text" id="patientName" placeholder="例如：王小明">
+        </div>
+    </div>
+
+    <h3>2. 勾選需發放的衛教單張</h3>
+    <div class="checkbox-group">
+        <label><input type="checkbox" value="NOAC.pdf"> NOAC 新型口服抗凝血劑</label>
+        <label><input type="checkbox" value="PRADAXA.pdf"> PRADAXA 普栓達</label>
+        <label><input type="checkbox" value="STATIN.pdf"> STATIN 降血脂藥物</label>
+        <label><input type="checkbox" value="抗凝血藥師門診宣導.pdf"> 抗凝血藥師門診宣導</label>
+    </div>
+
+    <button onclick="mergeSelectedPDFs()">生成並下載整合 PDF</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    async function mergeSelectedPDFs() {
+        const statusDiv = document.getElementById('status');
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        
+        // 取得輸入的病患資訊，並去除前後多餘空白
+        const bedNum = document.getElementById('bedNum').value.trim();
+        const mrn = document.getElementById('mrn').value.trim();
+        const patientName = document.getElementById('patientName').value.trim();
+        
+        if (checkboxes.length === 0) {
+            statusDiv.textContent = '請至少勾選一個衛教選項！';
+            statusDiv.style.color = '#e74c3c';
+            return;
+        }
+
+        statusDiv.textContent = '正在處理並合併 PDF，請稍候...';
+        statusDiv.style.color = '#27ae60';
+
+        try {
+            const { PDFDocument } = PDFLib;
+            const mergedPdf = await PDFDocument.create();
+
+            // 逐一讀取並合併勾選的 PDF
+            for (const checkbox of checkboxes) {
+                const fileName = checkbox.value;
+                const response = await fetch(fileName);
+                if (!response.ok) throw new Error(`404 找不到檔案: ${fileName}`);
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(arrayBuffer);
+                
+                const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+                copiedPages.forEach((page) => {
+                    mergedPdf.addPage(page);
+                });
+            }
+
+            const mergedPdfBytes = await mergedPdf.save();
+            
+            // 處理檔名邏輯
+            // 將輸入的資訊用 '-' 連接。如果欄位有填寫才加入，避免出現 "---中風衛教.pdf" 的情況
+            const nameParts = [];
+            if (bedNum) nameParts.push(bedNum);
+            if (mrn) nameParts.push(mrn);
+            if (patientName) nameParts.push(patientName);
+            
+            // 組合最終檔名，若全空則預設為 "中風衛教.pdf"
+            const finalFileName = nameParts.length > 0 
+                ? `${nameParts.join('-')}中風衛教.pdf` 
+                : '中風衛教.pdf';
+
+            // 觸發下載
+            const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = finalFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            statusDiv.textContent = `合併成功！已下載：${finalFileName}`;
+            
+        } catch (error) {
+            console.error(error);
+            statusDiv.textContent = `發生錯誤：${error.message}。請確認檔名大小寫與 GitHub 上完全一致。`;
+            statusDiv.style.color = '#e74c3c';
+        }
+    }
+</script>
+
+</body>
+</html>
