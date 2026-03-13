@@ -92,30 +92,26 @@
 
         try {
             const { PDFDocument } = PDFLib;
-            // 建立一個新的空白 PDF
             const mergedPdf = await PDFDocument.create();
 
             for (const checkbox of checkboxes) {
                 const fileName = checkbox.value;
                 
-                // 讀取本地的 PDF 檔案
+                // 讀取伺服器上的 PDF 檔案
                 const response = await fetch(fileName);
-                if (!response.ok) throw new Error(`找不到檔案: ${fileName}`);
+                if (!response.ok) throw new Error(`404 找不到檔案: ${fileName}`);
                 
                 const arrayBuffer = await response.arrayBuffer();
                 const pdfDoc = await PDFDocument.load(arrayBuffer);
                 
-                // 複製每一頁到新的 PDF 中
                 const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
                 copiedPages.forEach((page) => {
                     mergedPdf.addPage(page);
                 });
             }
 
-            // 儲存合併後的 PDF
             const mergedPdfBytes = await mergedPdf.save();
             
-            // 觸發下載
             const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -130,7 +126,8 @@
             
         } catch (error) {
             console.error(error);
-            statusDiv.textContent = '發生錯誤：請確認 PDF 檔案是否與網頁放在同一個資料夾，且檔名正確。';
+            // 將錯誤訊息顯示出來，方便除錯
+            statusDiv.textContent = `發生錯誤：${error.message}。請確認檔名大小寫與 GitHub 上完全一致。`;
             statusDiv.style.color = '#e74c3c';
         }
     }
