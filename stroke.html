@@ -118,7 +118,7 @@
         <label><input type="checkbox" value="抗凝血藥師門診宣導.pdf"> 抗凝血藥師門診宣導</label>
     </div>
 
-    <button onclick="mergeSelectedPDFs()">生成並下載整合 PDF</button>
+    <button onclick="mergeSelectedPDFs()">生成整合 PDF</button>
     <div id="status"></div>
 </div>
 
@@ -127,7 +127,6 @@
         const statusDiv = document.getElementById('status');
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         
-        // 取得輸入的病患資訊，並去除前後多餘空白
         const bedNum = document.getElementById('bedNum').value.trim();
         const mrn = document.getElementById('mrn').value.trim();
         const patientName = document.getElementById('patientName').value.trim();
@@ -145,7 +144,6 @@
             const { PDFDocument } = PDFLib;
             const mergedPdf = await PDFDocument.create();
 
-            // 逐一讀取並合併勾選的 PDF
             for (const checkbox of checkboxes) {
                 const fileName = checkbox.value;
                 const response = await fetch(fileName);
@@ -162,19 +160,34 @@
 
             const mergedPdfBytes = await mergedPdf.save();
             
-            // 處理檔名邏輯
-            // 將輸入的資訊用 '-' 連接。如果欄位有填寫才加入，避免出現 "---中風衛教.pdf" 的情況
             const nameParts = [];
             if (bedNum) nameParts.push(bedNum);
             if (mrn) nameParts.push(mrn);
             if (patientName) nameParts.push(patientName);
             
-            // 組合最終檔名，若全空則預設為 "中風衛教.pdf"
             const finalFileName = nameParts.length > 0 
                 ? `${nameParts.join('-')}中風衛教.pdf` 
                 : '中風衛教.pdf';
 
-            // 觸發下載
+            // 將 PDF 轉換為 File 物件，準備讓手機原生系統接手
+            const file = new File([mergedPdfBytes], finalFileName, { type: 'application/pdf' });
+
+            // 【核心修改】判斷是否支援手機的原生分享/開啟選單
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: finalFileName,
+                    });
+                    statusDiv.textContent = `處理完成！請在選單中選擇開啟或分享。`;
+                    return; // 成功呼叫手機選單後，就不往下執行電腦版的下載
+                } catch (error) {
+                    // 如果使用者在手機上按了「取消」，或者分享失敗，就會跑到這裡
+                    console.log('分享取消或失敗', error);
+                }
+            }
+
+            // 【電腦版預設方案】如果不是手機，或是手機分享失敗，走原本的下載流程
             const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -189,7 +202,7 @@
             
         } catch (error) {
             console.error(error);
-            statusDiv.textContent = `發生錯誤：${error.message}。請確認檔名大小寫與 GitHub 上完全一致。`;
+            statusDiv.textContent = `發生錯誤：${error.message}`;
             statusDiv.style.color = '#e74c3c';
         }
     }
