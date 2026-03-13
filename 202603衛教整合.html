@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>衛教資料整合系統</title>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .checkbox-group {
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        .checkbox-group label {
+            display: block;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #status {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>請勾選需發放的衛教單張：</h2>
+    
+    <div class="checkbox-group">
+        <label><input type="checkbox" value="NOAC.pdf"> NOAC 新型口服抗凝血劑</label>
+        <label><input type="checkbox" value="PRADAXA.pdf"> PRADAXA 普栓達</label>
+        <label><input type="checkbox" value="STATIN.pdf"> STATIN 降血脂藥物</label>
+        <label><input type="checkbox" value="抗凝血藥師門診宣導.pdf"> 抗凝血藥師門診宣導</label>
+    </div>
+
+    <button onclick="mergeSelectedPDFs()">生成並下載整合 PDF</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    async function mergeSelectedPDFs() {
+        const statusDiv = document.getElementById('status');
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        
+        if (checkboxes.length === 0) {
+            statusDiv.textContent = '請至少勾選一個衛教選項！';
+            statusDiv.style.color = '#e74c3c';
+            return;
+        }
+
+        statusDiv.textContent = '正在處理並合併 PDF，請稍候...';
+        statusDiv.style.color = '#27ae60';
+
+        try {
+            const { PDFDocument } = PDFLib;
+            // 建立一個新的空白 PDF
+            const mergedPdf = await PDFDocument.create();
+
+            for (const checkbox of checkboxes) {
+                const fileName = checkbox.value;
+                
+                // 讀取本地的 PDF 檔案
+                const response = await fetch(fileName);
+                if (!response.ok) throw new Error(`找不到檔案: ${fileName}`);
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(arrayBuffer);
+                
+                // 複製每一頁到新的 PDF 中
+                const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+                copiedPages.forEach((page) => {
+                    mergedPdf.addPage(page);
+                });
+            }
+
+            // 儲存合併後的 PDF
+            const mergedPdfBytes = await mergedPdf.save();
+            
+            // 觸發下載
+            const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '整合衛教資料.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            statusDiv.textContent = '合併成功！已開始下載。';
+            
+        } catch (error) {
+            console.error(error);
+            statusDiv.textContent = '發生錯誤：請確認 PDF 檔案是否與網頁放在同一個資料夾，且檔名正確。';
+            statusDiv.style.color = '#e74c3c';
+        }
+    }
+</script>
+
+</body>
+</html>
