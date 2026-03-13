@@ -86,35 +86,55 @@
         .btn-generate:hover {
             background-color: #2980b9;
         }
-        /* 新增：下載按鈕的樣式 */
-        .btn-download {
-            display: block;
-            text-align: center;
-            background-color: #27ae60;
-            color: white;
-            padding: 15px 24px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-top: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            animation: pulse 1.5s infinite;
-        }
-        .btn-download:hover {
-            background-color: #219a52;
-        }
         #status {
             margin-top: 15px;
             text-align: center;
             font-weight: bold;
             color: #e74c3c;
         }
-        /* 讓下載按鈕稍微有呼吸燈效果，吸引目光 */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        
+        /* 新增：雙按鈕選項區塊的樣式 */
+        .result-actions {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px dashed #bdc3c7;
+        }
+        .success-text {
+            color: #27ae60;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 15px 24px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s, background-color 0.3s;
+        }
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+        .btn-preview {
+            background-color: #f39c12; /* 橘黃色代表預覽 */
+            color: white;
+        }
+        .btn-preview:hover {
+            background-color: #d68910;
+        }
+        .btn-download {
+            background-color: #27ae60; /* 綠色代表下載/儲存 */
+            color: white;
+        }
+        .btn-download:hover {
+            background-color: #219a52;
         }
     </style>
 </head>
@@ -151,10 +171,10 @@
     
     <div id="status"></div>
 
-    <div id="resultArea" style="display: none;">
-        <a id="downloadLink" href="#" target="_blank" class="btn-download">
-            📥 處理完成！點此開啟 / 下載 PDF
-        </a>
+    <div id="resultArea" class="result-actions" style="display: none;">
+        <div class="success-text">✅ 衛教資料已合併成功！請選擇：</div>
+        <button id="previewBtn" class="btn-action btn-preview">👀 直接用網頁開啟 (預覽)</button>
+        <button id="downloadBtn" class="btn-action btn-download">📥 儲存檔案 / 下載</button>
     </div>
 </div>
 
@@ -162,15 +182,16 @@
     async function mergeSelectedPDFs() {
         const statusDiv = document.getElementById('status');
         const resultArea = document.getElementById('resultArea');
-        const downloadLink = document.getElementById('downloadLink');
+        const previewBtn = document.getElementById('previewBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         
         const bedNum = document.getElementById('bedNum').value.trim();
         const mrn = document.getElementById('mrn').value.trim();
         const patientName = document.getElementById('patientName').value.trim();
         
-        // 每次點擊先隱藏之前的下載按鈕
         resultArea.style.display = 'none';
+        statusDiv.textContent = '';
 
         if (checkboxes.length === 0) {
             statusDiv.textContent = '請至少勾選一個衛教選項！';
@@ -210,17 +231,28 @@
                 ? `${nameParts.join('-')}中風衛教.pdf` 
                 : '中風衛教.pdf';
 
-            // 將 PDF 轉為虛擬網址
+            // 產生虛擬檔案網址
             const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
 
-            // 【核心機制】：將虛擬網址綁定到綠色大按鈕上，等待使用者點擊
-            downloadLink.href = url;
-            downloadLink.download = finalFileName;
+            // 設定「預覽」按鈕的功能：直接在當前網頁跳轉
+            previewBtn.onclick = function() {
+                window.location.href = url;
+            };
+
+            // 設定「下載」按鈕的功能：強制觸發檔案下載
+            downloadBtn.onclick = function() {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = finalFileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
             
-            // 顯示綠色大按鈕，清空提示文字
+            // 處理完成，顯示雙選項按鈕，清空載入中的文字
+            statusDiv.textContent = '';
             resultArea.style.display = 'block';
-            statusDiv.textContent = '合併成功！請點擊下方綠色按鈕。';
             
         } catch (error) {
             console.error(error);
