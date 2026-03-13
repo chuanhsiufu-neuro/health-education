@@ -61,12 +61,17 @@
             display: block;
             margin-bottom: 12px;
             cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .checkbox-group label:hover {
+            background-color: #f0f3f4;
         }
         input[type="checkbox"] {
             margin-right: 10px;
             transform: scale(1.2);
         }
-        button {
+        .btn-generate {
             background-color: #3498db;
             color: white;
             border: none;
@@ -78,14 +83,38 @@
             transition: background-color 0.3s;
             font-weight: bold;
         }
-        button:hover {
+        .btn-generate:hover {
             background-color: #2980b9;
+        }
+        /* 新增：下載按鈕的樣式 */
+        .btn-download {
+            display: block;
+            text-align: center;
+            background-color: #27ae60;
+            color: white;
+            padding: 15px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: pulse 1.5s infinite;
+        }
+        .btn-download:hover {
+            background-color: #219a52;
         }
         #status {
             margin-top: 15px;
             text-align: center;
             font-weight: bold;
             color: #e74c3c;
+        }
+        /* 讓下載按鈕稍微有呼吸燈效果，吸引目光 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -118,19 +147,31 @@
         <label><input type="checkbox" value="抗凝血藥師門診宣導.pdf"> 抗凝血藥師門診宣導</label>
     </div>
 
-    <button onclick="mergeSelectedPDFs()">生成整合 PDF</button>
+    <button class="btn-generate" onclick="mergeSelectedPDFs()">開始生成整合 PDF</button>
+    
     <div id="status"></div>
+
+    <div id="resultArea" style="display: none;">
+        <a id="downloadLink" href="#" target="_blank" class="btn-download">
+            📥 處理完成！點此開啟 / 下載 PDF
+        </a>
+    </div>
 </div>
 
 <script>
     async function mergeSelectedPDFs() {
         const statusDiv = document.getElementById('status');
+        const resultArea = document.getElementById('resultArea');
+        const downloadLink = document.getElementById('downloadLink');
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         
         const bedNum = document.getElementById('bedNum').value.trim();
         const mrn = document.getElementById('mrn').value.trim();
         const patientName = document.getElementById('patientName').value.trim();
         
+        // 每次點擊先隱藏之前的下載按鈕
+        resultArea.style.display = 'none';
+
         if (checkboxes.length === 0) {
             statusDiv.textContent = '請至少勾選一個衛教選項！';
             statusDiv.style.color = '#e74c3c';
@@ -169,35 +210,17 @@
                 ? `${nameParts.join('-')}中風衛教.pdf` 
                 : '中風衛教.pdf';
 
-            // 將 PDF 轉為 Blob 物件並產生專屬網址
+            // 將 PDF 轉為虛擬網址
             const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
 
-            // 【核心修改】判斷是否為手機或平板 (iOS 或 Android)
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                // 手機版：直接用瀏覽器開啟 PDF 預覽
-                // 嘗試開啟新分頁，若被阻擋則直接跳轉當前頁面
-                const newTab = window.open(url, '_blank');
-                if (!newTab) {
-                    window.location.href = url;
-                }
-                statusDiv.textContent = '合併成功！已開啟預覽。';
-            } else {
-                // 電腦版：維持直接下載的邏輯
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = finalFileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                
-                // 延遲釋放記憶體，確保下載穩定
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-                
-                statusDiv.textContent = `合併成功！已下載：${finalFileName}`;
-            }
+            // 【核心機制】：將虛擬網址綁定到綠色大按鈕上，等待使用者點擊
+            downloadLink.href = url;
+            downloadLink.download = finalFileName;
+            
+            // 顯示綠色大按鈕，清空提示文字
+            resultArea.style.display = 'block';
+            statusDiv.textContent = '合併成功！請點擊下方綠色按鈕。';
             
         } catch (error) {
             console.error(error);
