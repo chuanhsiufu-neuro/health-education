@@ -169,36 +169,35 @@
                 ? `${nameParts.join('-')}中風衛教.pdf` 
                 : '中風衛教.pdf';
 
-            // 將 PDF 轉換為 File 物件，準備讓手機原生系統接手
-            const file = new File([mergedPdfBytes], finalFileName, { type: 'application/pdf' });
-
-            // 【核心修改】判斷是否支援手機的原生分享/開啟選單
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: finalFileName,
-                    });
-                    statusDiv.textContent = `處理完成！請在選單中選擇開啟或分享。`;
-                    return; // 成功呼叫手機選單後，就不往下執行電腦版的下載
-                } catch (error) {
-                    // 如果使用者在手機上按了「取消」，或者分享失敗，就會跑到這裡
-                    console.log('分享取消或失敗', error);
-                }
-            }
-
-            // 【電腦版預設方案】如果不是手機，或是手機分享失敗，走原本的下載流程
+            // 將 PDF 轉為 Blob 物件並產生專屬網址
             const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = finalFileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            statusDiv.textContent = `合併成功！已下載：${finalFileName}`;
+
+            // 【核心修改】判斷是否為手機或平板 (iOS 或 Android)
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                // 手機版：直接用瀏覽器開啟 PDF 預覽
+                // 嘗試開啟新分頁，若被阻擋則直接跳轉當前頁面
+                const newTab = window.open(url, '_blank');
+                if (!newTab) {
+                    window.location.href = url;
+                }
+                statusDiv.textContent = '合併成功！已開啟預覽。';
+            } else {
+                // 電腦版：維持直接下載的邏輯
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = finalFileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                // 延遲釋放記憶體，確保下載穩定
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                
+                statusDiv.textContent = `合併成功！已下載：${finalFileName}`;
+            }
             
         } catch (error) {
             console.error(error);
