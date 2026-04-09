@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>腦中風衛教寶盒 StrokeCare Box</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --line:#d9e2ef;
+      --text:#243041;
+      --muted:#667085;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --soft:#eff6ff;
+      --accent:#0f766e;
+      --warn:#b45309;
+      --danger:#b91c1c;
+      --shadow:0 12px 30px rgba(15,23,42,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,#edf4ff 0%,var(--bg) 100%);
+    }
+    .wrap{max-width:1500px;margin:0 auto;padding:20px}
+    .hero,.panel,.block,.edu-card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+    }
+    .hero{padding:26px;margin-bottom:18px}
+    h1{margin:0;font-size:34px}
+    .sub{margin-top:10px;line-height:1.8;color:var(--muted)}
+    .chips,.badges,.inline-actions,.tabbar,.preset-row{display:flex;flex-wrap:wrap;gap:8px}
+    .chip,.badge{
+      display:inline-flex;align-items:center;
+      padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px
+    }
+    .layout{display:grid;grid-template-columns:520px 1fr;gap:18px}
+    .panel{padding:18px}
+    .section{margin-bottom:18px}
+    .section h2{font-size:22px;margin:0 0 14px}
+    .section h3{font-size:15px;margin:0 0 10px}
+    .grid2,.grid3,.grid4{display:grid;gap:12px}
+    .grid2{grid-template-columns:1fr 1fr}
+    .grid3{grid-template-columns:repeat(3,1fr)}
+    .grid4{grid-template-columns:repeat(4,1fr)}
+    .full{grid-column:1/-1}
+    label.lbl{display:block;font-size:13px;font-weight:700;color:#334155;margin-bottom:6px}
+    input[type=text],input[type=number],select,textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:11px 12px;
+      font-size:14px;
+      background:#fff;
+      color:var(--text);
+    }
+    textarea{min-height:92px;resize:vertical}
+    .divider{height:1px;background:var(--line);margin:18px 0}
+    .check-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .check-item{
+      display:flex;align-items:flex-start;gap:10px;
+      padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff
+    }
+    .check-item small{display:block;color:var(--muted);margin-top:2px;line-height:1.5}
+    button{
+      border:none;background:var(--primary);color:#fff;border-radius:14px;
+      padding:11px 15px;font-size:14px;font-weight:800;cursor:pointer
+    }
+    button:hover{background:var(--primary-dark)}
+    button.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
+    button.soft{background:var(--soft);color:#1e3a8a}
+    .preset{padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--text)}
+    .preset.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .preview-top{
+      padding:16px;border-radius:20px;background:#f8fbff;border:1px solid #d8e7ff;margin-bottom:14px
+    }
+    .note-box{
+      padding:14px;border-radius:18px;background:#fff;border:1px dashed var(--line);line-height:1.8
+    }
+    .tab{
+      background:#fff;color:var(--text);border:1px solid var(--line);padding:10px 14px;border-radius:14px;font-weight:800;cursor:pointer
+    }
+    .tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .hidden{display:none}
+    .edu-card{padding:16px;margin-bottom:12px}
+    .edu-card h3{margin:0 0 10px;font-size:18px}
+    .edu-card ul{margin:0;padding-left:20px}
+    .edu-card li{line-height:1.9;margin-bottom:4px}
+    .script-line{
+      padding:14px;border-radius:16px;background:#f8fafc;border:1px solid var(--line);margin-bottom:10px;line-height:1.8
+    }
+    .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .summary-card{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
+    .summary-card ul{margin:0;padding-left:20px}
+    .summary-card li{line-height:1.9}
+    .hint{font-size:13px;color:var(--muted)}
+    .status{display:none;margin-top:10px;padding:12px 14px;border-radius:16px;background:#ecfeff;color:#155e75;border:1px solid #a5f3fc}
+    .critical{
+      background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:18px;padding:14px;line-height:1.8
+    }
+    .danger{
+      background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:18px;padding:14px;line-height:1.8
+    }
+    @media (max-width: 1100px){
+      .layout{grid-template-columns:1fr}
+      .grid2,.grid3,.grid4,.check-grid,.summary-grid{grid-template-columns:1fr}
+      .wrap{padding:12px}
+      h1{font-size:28px}
+    }
+    .print-header,.print-checklist{display:none}
+    .a4-sheet{
+      max-width:210mm;
+      margin:0 auto;
+      background:#fff;
+    }
+    .hospital-header{
+      text-align:center;
+      padding-bottom:10px;
+      border-bottom:2px solid #94a3b8;
+      margin-bottom:14px;
+    }
+    .hospital-header h2{
+      margin:0;
+      font-size:24px;
+      letter-spacing:1px;
+    }
+    .hospital-header .meta{
+      margin-top:8px;
+      font-size:13px;
+      color:#475569;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+    }
+    .formal-box{
+      border:1px solid #94a3b8;
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+      box-shadow:none;
+    }
+    .formal-box h3{
+      margin:0 0 8px;
+      font-size:17px;
+    }
+    .checklist-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px 16px;
+    }
+    .check-item-print{
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+      line-height:1.8;
+      font-size:14px;
+    }
+    .box{
+      width:16px;
+      height:16px;
+      border:1.6px solid #334155;
+      display:inline-block;
+      flex:0 0 16px;
+      margin-top:4px;
+    }
+    .signature-row{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:16px;
+      margin-top:16px;
+      font-size:14px;
+    }
+    .signature-line{
+      border-top:1px solid #475569;
+      padding-top:6px;
+      min-height:28px;
+    }
+    .qr-panel{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:14px;
+      align-items:center;
+      border:1px solid #94a3b8;
+      border-radius:8px;
+      padding:12px;
+      margin-top:12px;
+      background:#fff;
+    }
+    .qr-box{
+      width:108px;
+      height:108px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#fff;
+      border:1px solid #cbd5e1;
+      border-radius:6px;
+      overflow:hidden;
+    }
+    .qr-box img{
+      max-width:100%;
+      max-height:100%;
+    }
+    .qr-meta{
+      font-size:13px;
+      color:#475569;
+      line-height:1.8;
+      word-break:break-all;
+    }
+    @page{
+      size:A4 portrait;
+      margin:12mm;
+    }
+    @media print{
+      body{background:#fff}
+      .hero,.left,.tabbar,.inline-actions,.hint,.status{display:none !important}
+      .layout{display:block}
+      .panel{box-shadow:none;border:none;padding:0}
+      .edu-card{break-inside:avoid;box-shadow:none}
+      .preview-top,.critical,.note-box,.badges,.sub{box-shadow:none}
+      .right .panel{
+        padding:0;
+      }
+      .a4-sheet{
+        max-width:none;
+      }
+      .screen-only-print-hide{
+        display:none !important;
+      }
+      .print-header,.print-checklist{
+        display:block !important;
+      }
+      .edu-card{
+        border:1px solid #94a3b8;
+        border-radius:8px;
+        padding:10px 12px;
+        margin-bottom:10px;
+      }
+      .danger,.critical,.summary-card{
+        border-radius:8px;
+        box-shadow:none;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="chips">
+      <span class="chip">腦中風病人</span>
+      <span class="chip">個別化衛教</span>
+      <span class="chip">護理師快速生成</span>
+      <span class="chip">床邊 / 家屬 / 出院</span>
+      <span class="chip">可列印 PDF</span>
+      <span class="chip">QR code 分享</span>
+    </div>
+    <h1>腦中風衛教寶盒 StrokeCare Box</h1>
+    <div class="sub">
+      這一版強化為臨床使用導向：依中風類型、功能狀態、吞嚥與跌倒風險、照護階段、家屬學習需求，自動推薦最適合的衛教內容，同時產出護理師床邊講稿、家屬版重點與出院提醒。
+    </div>
+    <div class="inline-actions" style="margin-top:16px">
+      <button onclick="generateAll()">立即更新內容</button>
+      <button class="secondary" onclick="window.print()">列印 / 另存 PDF</button>
+      <button class="soft" onclick="saveDraft()">儲存草稿</button>
+      <button class="secondary" onclick="loadDraft()">載入草稿</button>
+      <button class="secondary" onclick="resetForm()">清空重設</button>
+    </div>
+    <div class="status" id="status">已更新衛教內容，可直接列印或存成 PDF。</div>
+  </div>
+
+  <div class="layout">
+    <div class="left">
+      <div class="panel">
+        <div class="section">
+          <h2>1. 基本資料</h2>
+          <div class="grid2">
+            <div>
+              <label class="lbl">病人姓名</label>
+              <input id="patientName" type="text" value="王小明">
+            </div>
+            <div>
+              <label class="lbl">床號</label>
+              <input id="bedNumber" type="text" value="5D-12">
+            </div>
+            <div>
+              <label class="lbl">病歷號</label>
+              <input id="mrn" type="text" value="12345678">
+            </div>
+            <div>
+              <label class="lbl">執行護理師</label>
+              <input id="educator" type="text" value="護理師子芸">
+            </div>
+            <div>
+              <label class="lbl">衛教對象</label>
+              <select id="audience">
+                <option>病人與家屬</option>
+                <option>家屬</option>
+                <option>病人本人</option>
+                <option>外籍照顧者</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">語言偏好</label>
+              <select id="language">
+                <option>中文</option>
+                <option>台語</option>
+                <option>中英雙語</option>
+                <option>簡化白話版</option>
+              </select>
+            </div>
+            <div class="full">
+              <label class="lbl">主要診斷</label>
+              <input id="diagnosis" type="text" value="右側缺血性腦中風">
+            </div>
+            <div class="full">
+              <label class="lbl">QR code 連結（可填院內衛教網址，未填則自動用目前頁面）</label>
+              <input id="qrLink" type="text" value="">
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+          <h2>2. 臨床情況快速設定</h2>
+          <h3>中風類型 / 階段</h3>
+          <input id="strokeType" type="hidden" value="ischemic">
+          <div class="preset-row">
+            <button type="button" class="preset active" id="preset-ischemic" onclick="applyPreset('ischemic')">缺血性中風</button>
+            <button type="button" class="preset" id="preset-hemorrhagic" onclick="applyPreset('hemorrhagic')">出血性中風</button>
+            <button type="button" class="preset" id="preset-tia" onclick="applyPreset('tia')">TIA</button>
+            <button type="button" class="preset" id="preset-postop" onclick="applyPreset('postop')">術後照護</button>
+          </div>
+          <div class="grid3" style="margin-top:12px">
+            <div>
+              <label class="lbl">照護階段</label>
+              <select id="careStage">
+                <option>住院初期</option>
+                <option>住院穩定期</option>
+                <option>復健期</option>
+                <option>出院前</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">吞嚥狀況</label>
+              <select id="swallowLevel">
+                <option>正常</option>
+                <option selected>疑似吞嚥困難</option>
+                <option>需濃稠流質 / 軟質飲食</option>
+                <option>禁食 / 管灌</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">活動能力</label>
+              <select id="mobility">
+                <option>可自行活動</option>
+                <option>需陪同步行</option>
+                <option selected>需協助移位/下床</option>
+                <option>臥床為主</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">復健階段</label>
+              <select id="rehabStage">
+                <option>急性期：以安全與併發症預防為主</option>
+                <option selected>恢復期：開始規律復健與功能重建</option>
+                <option>準備出院期：強化家屬照護與居家自我管理</option>
+                <option>長期追蹤期：持續復健與再中風預防</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">溝通狀況</label>
+              <select id="communication">
+                <option>可清楚表達</option>
+                <option>理解可，表達差</option>
+                <option>失語 / 溝通困難</option>
+                <option>意識差，以家屬衛教為主</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">主要照顧者</label>
+              <input id="caregiver" type="text" value="配偶">
+            </div>
+            <div>
+              <label class="lbl">家庭準備度</label>
+              <select id="homeReadiness">
+                <option>良好</option>
+                <option selected>需再加強</option>
+                <option>高風險，需反覆衛教</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">鼻胃管</label>
+              <select id="hasNG">
+                <option>無</option>
+                <option>有，需衛教</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">管灌</label>
+              <select id="hasTubeFeeding">
+                <option>無</option>
+                <option>有，需衛教</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">尿管</label>
+              <select id="hasFoley">
+                <option>無</option>
+                <option>有，需衛教</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">氣切</label>
+              <select id="hasTrach">
+                <option>無</option>
+                <option>有，需衛教</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+          <h2>3. 個別化風險</h2>
+          <div class="check-grid">
+            <label class="check-item"><input type="checkbox" id="riskWeakness" checked><span><b>偏癱 / 無力</b><small>移位與患側保護須加強</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskDysphagia" checked><span><b>吞嚥困難</b><small>進食型態與嗆咳風險</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskAphasia"><span><b>失語 / 溝通困難</b><small>家屬版與簡化版衛教</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskMental"><span><b>意識改變</b><small>照護重點以家屬為主</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskFall" checked><span><b>高跌倒風險</b><small>下床、如廁、夜間安全提醒</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskPressure"><span><b>壓傷風險</b><small>翻身與皮膚照護</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskTube"><span><b>有管路照護需求</b><small>鼻胃管、尿管、點滴等</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskBleed"><span><b>出血風險 / 抗凝血藥</b><small>需加強用藥與警訊</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskNG"><span><b>鼻胃管照護</b><small>固定與灌食安全</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskFoley"><span><b>尿管照護</b><small>尿袋位置與感染預防</small></span></label>
+            <label class="check-item"><input type="checkbox" id="riskTrach"><span><b>氣切照護</b><small>呼吸道與分泌物觀察</small></span></label>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+          <h2>4. 衛教主題</h2>
+          <div class="check-grid" id="topicArea"></div>
+        </div>
+
+        <div class="section">
+          <h2>5. 護理備註</h2>
+          <textarea id="note">病人左側無力、需協助下床，家屬主要照顧者已在旁學習。出院前需再加強吞嚥安全與居家防跌。</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <div class="tabbar">
+          <button class="tab active" onclick="switchTab('preview', this)">客製化衛教單</button>
+          <button class="tab" onclick="switchTab('family', this)">家屬版單張</button>
+          <button class="tab" onclick="switchTab('summary', this)">護理摘要</button>
+          <button class="tab" onclick="switchTab('discharge', this)">出院提醒</button>
+        </div>
+
+        <div id="tab-preview">
+          <div class="a4-sheet">
+          <div class="print-header">
+            <div class="hospital-header">
+              <h2>腦中風衛教寶盒 StrokeCare Box｜腦中風病人個別化衛教單張</h2>
+              <div class="meta" id="printMetaTop"></div>
+            </div>
+          </div>
+          <div class="preview-top">
+            <div class="badges" id="previewBadges"></div>
+            <div class="sub" id="introText" style="margin-top:10px"></div>
+          </div>
+          <div class="critical" id="priorityBox"></div>
+          <div style="height:12px"></div>
+          <div id="previewCards"></div>
+          <div class="formal-box">
+            <h3>中風復健階段化內容</h3>
+            <ul id="rehabStageContent"></ul>
+          </div>
+          <div class="note-box" id="noteBox"></div>
+          <div class="qr-panel">
+            <div class="qr-box" id="qrPreview"></div>
+            <div class="qr-meta">
+              <b>衛教 QR code</b><br>
+              可提供家屬以手機掃描，查看本頁連結或院內衛教網址。<br>
+              <span id="qrPreviewText"></span>
+            </div>
+          </div>
+          </div>
+        </div>
+
+        
+        <div id="tab-family" class="hidden">
+          <div class="preview-top">
+            <div class="badges" id="familyBadges"></div>
+            <div class="sub" style="margin-top:10px">以下內容可直接列印作為家屬版衛教單張，語句較白話、重點更集中。</div>
+          </div>
+          <div class="edu-card">
+            <h3>家屬版重點提醒</h3>
+            <ul id="familyLeaflet"></ul>
+          </div>
+          <div class="edu-card">
+            <h3>家屬照護注意事項</h3>
+            <ul id="familyCarePoints"></ul>
+          </div>
+          <div class="danger" id="familyDanger"></div>
+        </div>
+
+        <div id="tab-summary" class="hidden">
+          <div class="summary-grid">
+            <div class="summary-card">
+              <h3 style="margin:0 0 12px">病人重點概況</h3>
+              <div class="badges" id="summaryRiskBadges"></div>
+              <div style="margin-top:12px;line-height:1.9">
+                <div><b>姓名：</b><span id="sumName"></span></div>
+                <div><b>床號：</b><span id="sumBed"></span></div>
+                <div><b>診斷：</b><span id="sumDx"></span></div>
+                <div><b>照護階段：</b><span id="sumStage"></span></div>
+                <div><b>復健階段：</b><span id="sumRehabStage"></span></div>
+                <div><b>照顧者：</b><span id="sumCaregiver"></span></div>
+                <div><b>護理師：</b><span id="sumEducator"></span></div>
+              </div>
+            </div>
+            <div class="summary-card">
+              <h3 style="margin:0 0 12px">衛教已涵蓋項目</h3>
+              <ul id="summaryTopics"></ul>
+            </div>
+            <div class="summary-card">
+              <h3 style="margin:0 0 12px">建議優先追蹤</h3>
+              <ul id="summaryFollow"></ul>
+            </div>
+            <div class="summary-card">
+              <h3 style="margin:0 0 12px">再次衛教建議時機</h3>
+              <ul id="summaryTiming"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-discharge" class="hidden">
+          <div class="a4-sheet">
+            <div class="print-header">
+              <div class="hospital-header">
+                <h2>腦中風衛教寶盒 StrokeCare Box｜腦中風病人出院前衛教 Checklist</h2>
+                <div class="meta" id="printMetaDischarge"></div>
+              </div>
+            </div>
+            <div class="preview-top screen-only-print-hide">
+              <div class="badges" id="dischargeBadges"></div>
+              <div class="sub" style="margin-top:10px">出院前可直接列印本頁作為返家重點提醒與交班簽核。</div>
+            </div>
+            <div class="danger" id="dangerSigns"></div>
+            <div style="height:12px"></div>
+            <div class="formal-box print-checklist">
+              <h3>出院前 Checklist 勾選版</h3>
+              <div class="checklist-grid" id="dischargeChecklistPrint"></div>
+              <div class="signature-row">
+                <div class="signature-line">護理師簽名：</div>
+                <div class="signature-line">家屬 / 病人簽名：</div>
+                <div class="signature-line">日期：</div>
+              </div>
+            </div>
+            <div class="edu-card">
+              <h3>返家照護清單</h3>
+              <ul id="homeChecklist"></ul>
+            </div>
+            <div class="edu-card">
+              <h3>回診 / 持續照護提醒</h3>
+              <ul id="followupChecklist"></ul>
+            </div>
+            <div class="qr-panel">
+              <div class="qr-box" id="qrDischarge"></div>
+              <div class="qr-meta">
+                <b>出院後家屬可掃描 QR code</b><br>
+                可連到本頁或妳未來替換的正式衛教網址。<br>
+                <span id="qrDischargeText"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint" style="margin-top:12px">
+          使用方式：左側輸入與勾選後，內容會自動更新。建議列印前切到想輸出的頁籤。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const topicDefinitions = {
+  intro: {
+    label: "腦中風基本認識",
+    desc: "疾病概念、警訊與再中風預防",
+    lines: [
+      "腦中風分為缺血性與出血性，治療後仍需持續追蹤與規律服藥。",
+      "若出現臉歪、手腳無力、說話不清、意識改變或劇烈頭痛，需立即就醫。",
+      "控制血壓、血糖、血脂與戒菸，能降低再次中風風險。"
+    ]
+  },
+  swallow: {
+    label: "吞嚥與進食安全",
+    desc: "吞嚥風險、嗆咳預防、飲食型態",
+    lines: [
+      "進食前請先坐正或抬高床頭，避免平躺進食。",
+      "有咳嗽、嗆到、濕囉音或吞不下時，請先停止進食並通知護理師。",
+      "飲食型態需依醫囑選擇，如濃稠流質、軟質飲食或管灌，不可自行更改。"
+    ]
+  },
+  fall: {
+    label: "跌倒預防",
+    desc: "起身、如廁與夜間安全",
+    lines: [
+      "下床、如廁、洗澡前請先按鈴，由護理人員或家屬陪同。",
+      "穿防滑鞋並保持走道乾燥，避免自行急著站起來。",
+      "如有頭暈、腳無力、視線不穩或夜間頻尿，更要加強陪同。"
+    ]
+  },
+  rehab: {
+    label: "復健與活動",
+    desc: "偏癱肢體保護與循序活動",
+    lines: [
+      "依醫師與治療師建議，進行翻身、被動關節運動、坐起與步行訓練。",
+      "偏癱側肢體需特別保護，移位時避免拉扯患側手臂。",
+      "活動量循序漸進，若有頭暈、喘或無力加劇，應先休息並評估。"
+    ]
+  },
+  medication: {
+    label: "藥物與慢性病控制",
+    desc: "抗血小板、抗凝血與慢性病管理",
+    lines: [
+      "請依醫囑規律服藥，不可自行停藥、漏服或重複服藥。",
+      "規律控制血壓、血糖與血脂，有助降低再次中風風險。",
+      "若有黑便、血尿、異常出血、劇烈頭痛或意識變差，應盡快就醫。"
+    ]
+  },
+  tube: {
+    label: "管路與安全照護",
+    desc: "鼻胃管、尿管、點滴固定",
+    lines: [
+      "留置鼻胃管、尿管或點滴時，勿自行拉扯或拔除。",
+      "翻身或移位前先確認管路固定與位置是否正確。",
+      "若發現滑脫、阻塞、滲血或皮膚紅腫，請立即告知護理師。"
+    ]
+  },
+  pressure: {
+    label: "皮膚與壓傷預防",
+    desc: "翻身與皮膚觀察",
+    lines: [
+      "長時間臥床時需規律翻身，減少局部受壓。",
+      "保持皮膚清潔乾燥，若有泛紅、破皮或疼痛需盡早處理。",
+      "足跟、臀部與骨突處是高風險部位，需特別觀察。"
+    ]
+  },
+  communication: {
+    label: "溝通與家屬協助",
+    desc: "失語或理解困難時的照護方式",
+    lines: [
+      "與病人說話時請放慢速度、一次一句、給予回應時間。",
+      "可搭配手勢、圖片、關鍵字或家屬協助，幫助理解。",
+      "即使表達困難，也要持續鼓勵病人參與溝通與復健。"
+    ]
+  },
+  ngtube: {
+    label: "鼻胃管照護",
+    desc: "固定、灌食前後與滑脫觀察",
+    lines: [
+      "鼻胃管請勿自行拉扯，翻身與移位時先確認固定位置。",
+      "灌食前確認姿勢，床頭抬高至少 30 到 45 度，可降低嗆咳風險。",
+      "若出現滑脫、反覆咳嗽、滲漏、腹脹或嘔吐，需立即通知醫護人員。"
+    ]
+  },
+  tubeFeeding: {
+    label: "管灌衛教",
+    desc: "灌食速度、姿勢與不耐受觀察",
+    lines: [
+      "灌食時病人需採半坐臥姿勢，灌食後仍維持抬高床頭約 30 分鐘。",
+      "灌食速度不可過快，並依醫囑給予灌食量與水分。",
+      "若出現腹脹、腹瀉、嘔吐、嗆咳或殘餘量異常，需暫停並評估。"
+    ]
+  },
+  foley: {
+    label: "尿管照護",
+    desc: "尿袋位置、牽扯與感染預防",
+    lines: [
+      "尿袋應低於膀胱位置，避免回流造成感染。",
+      "翻身或移位時避免尿管拉扯、折到或壓住。",
+      "若出現尿液變少、血尿、發燒、尿液混濁或尿管滑脫，需告知醫護人員。"
+    ]
+  },
+  trach: {
+    label: "氣切照護",
+    desc: "氣切口觀察、分泌物與呼吸道安全",
+    lines: [
+      "氣切病人需注意分泌物多寡、呼吸聲、痰液顏色與呼吸是否費力。",
+      "氣切固定帶與周圍皮膚需保持清潔乾燥，避免壓傷或感染。",
+      "若出現脫管、呼吸喘、血氧下降、痰塞或皮膚紅腫滲液，需立即處理。"
+    ]
+  },
+  discharge: {
+    label: "出院返家重點",
+    desc: "返家照護、警訊與回診",
+    lines: [
+      "返家後持續服藥、復健、飲食調整與規律回診。",
+      "居家環境請保持走道通暢、浴廁防滑，避免再次跌倒。",
+      "若出現新的無力、語言改變、劇烈頭痛或意識改變，請立即就醫。"
+    ]
+  }
+};
+
+const presets = {
+  ischemic: ["intro","swallow","fall","rehab","medication","discharge"],
+  hemorrhagic: ["intro","swallow","fall","rehab","tube","medication","discharge"],
+  tia: ["intro","medication","fall","discharge"],
+  postop: ["intro","swallow","fall","rehab","tube","pressure","discharge"]
+};
+
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+function badge(s){ return `<span class="badge">${s}</span>`; }
+function $(id){ return document.getElementById(id); }
+
+function renderTopicArea(){
+  const area = $("topicArea");
+  area.innerHTML = Object.entries(topicDefinitions).map(([key,val]) => `
+    <label class="check-item">
+      <input type="checkbox" id="topic-${key}">
+      <span><b>${val.label}</b><small>${val.desc}</small></span>
+    </label>
+  `).join("");
+}
+
+function setPresetButtons(type){
+  ["ischemic","hemorrhagic","tia","postop"].forEach(k=>{
+    $("preset-"+k).classList.toggle("active", k===type);
+  });
+}
+
+function applyPreset(type){
+  $("strokeType").value = type;
+  setPresetButtons(type);
+  Object.keys(topicDefinitions).forEach(k => {
+    const el = $("topic-"+k);
+    if(el) el.checked = presets[type].includes(k);
+  });
+
+  if(type==="hemorrhagic"){
+    $("riskBleed").checked = true;
+    $("riskTube").checked = true;
+  }
+  if(type==="tia"){
+    $("riskBleed").checked = false;
+    $("riskTube").checked = false;
+  }
+  if($("hasNG").value === "有，需衛教") $("topic-ngtube").checked = true;
+  if($("hasTubeFeeding").value === "有，需衛教") $("topic-tubeFeeding").checked = true;
+  if($("hasFoley").value === "有，需衛教") $("topic-foley").checked = true;
+  if($("hasTrach").value === "有，需衛教") $("topic-trach").checked = true;
+  generateAll();
+}
+
+function collectData(){
+  return {
+    patientName: $("patientName").value.trim(),
+    bedNumber: $("bedNumber").value.trim(),
+    mrn: $("mrn").value.trim(),
+    educator: $("educator").value.trim(),
+    audience: $("audience").value,
+    language: $("language").value,
+    diagnosis: $("diagnosis").value.trim(),
+    qrLink: $("qrLink").value.trim(),
+    strokeType: $("strokeType").value,
+    careStage: $("careStage").value,
+    swallowLevel: $("swallowLevel").value,
+    mobility: $("mobility").value,
+    rehabStage: $("rehabStage").value,
+    communication: $("communication").value,
+    caregiver: $("caregiver").value.trim(),
+    homeReadiness: $("homeReadiness").value,
+    hasNG: $("hasNG").value,
+    hasTubeFeeding: $("hasTubeFeeding").value,
+    hasFoley: $("hasFoley").value,
+    hasTrach: $("hasTrach").value,
+    note: $("note").value.trim(),
+    risks: {
+      weakness: $("riskWeakness").checked,
+      dysphagia: $("riskDysphagia").checked,
+      aphasia: $("riskAphasia").checked,
+      mental: $("riskMental").checked,
+      fall: $("riskFall").checked,
+      pressure: $("riskPressure").checked,
+      tube: $("riskTube").checked,
+      bleed: $("riskBleed").checked,
+      ng: $("riskNG").checked,
+      foley: $("riskFoley").checked,
+      trach: $("riskTrach").checked
+    },
+    topics: Object.keys(topicDefinitions).filter(k => $("topic-"+k).checked)
+  };
+}
+
+function typeLabel(type){
+  if(type==="ischemic") return "缺血性中風";
+  if(type==="hemorrhagic") return "出血性中風";
+  if(type==="tia") return "TIA";
+  return "術後照護";
+}
+
+function riskLabels(r){
+  const out=[];
+  if(r.weakness) out.push("偏癱/無力");
+  if(r.dysphagia) out.push("吞嚥困難");
+  if(r.aphasia) out.push("失語/溝通困難");
+  if(r.mental) out.push("意識改變");
+  if(r.fall) out.push("高跌倒風險");
+  if(r.pressure) out.push("壓傷風險");
+  if(r.tube) out.push("管路照護");
+  if(r.bleed) out.push("出血風險/抗凝血藥");
+  if(r.ng) out.push("鼻胃管照護");
+  if(r.foley) out.push("尿管照護");
+  if(r.trach) out.push("氣切照護");
+  return out;
+}
+
+function autoRecommendations(d){
+  const rec=[];
+  if(d.risks.dysphagia && !d.topics.includes("swallow")) rec.push("建議加入『吞嚥與進食安全』衛教。");
+  if(d.risks.fall && !d.topics.includes("fall")) rec.push("建議加入『跌倒預防』衛教。");
+  if(d.risks.weakness && !d.topics.includes("rehab")) rec.push("建議加入『復健與活動』衛教。");
+  if(d.risks.bleed && !d.topics.includes("medication")) rec.push("建議加入『藥物與慢性病控制』衛教。");
+  if(d.risks.tube && !d.topics.includes("tube")) rec.push("建議加入『管路與安全照護』衛教。");
+  if(d.risks.pressure && !d.topics.includes("pressure")) rec.push("建議加入『皮膚與壓傷預防』衛教。");
+  if((d.risks.aphasia || d.communication.includes("失語")) && !d.topics.includes("communication")) rec.push("建議加入『溝通與家屬協助』衛教。");
+  if((d.risks.ng || d.hasNG === "有，需衛教") && !d.topics.includes("ngtube")) rec.push("建議加入『鼻胃管照護』衛教。");
+  if(d.hasTubeFeeding === "有，需衛教" && !d.topics.includes("tubeFeeding")) rec.push("建議加入『管灌衛教』衛教。");
+  if((d.risks.foley || d.hasFoley === "有，需衛教") && !d.topics.includes("foley")) rec.push("建議加入『尿管照護』衛教。");
+  if((d.risks.trach || d.hasTrach === "有，需衛教") && !d.topics.includes("trach")) rec.push("建議加入『氣切照護』衛教。");
+  if(d.careStage==="出院前" && !d.topics.includes("discharge")) rec.push("建議加入『出院返家重點』衛教。");
+  return rec;
+}
+
+function previewIntro(d, risks){
+  return `本次衛教對象為 ${escapeHtml(d.audience)}，病人為 ${escapeHtml(d.diagnosis || "腦中風病人")}，屬於 ${typeLabel(d.strokeType)}、${escapeHtml(d.careStage)}。目前主要照護重點為 ${risks.length ? risks.join("、") : "一般照護"}。`;
+}
+
+function buildPriorityText(d){
+  const items=[];
+  if(d.risks.dysphagia || d.swallowLevel !== "正常") items.push("進食前先坐正、避免平躺；若嗆咳或吞不下立即停止進食。");
+  if(d.risks.fall || d.mobility !== "可自行活動") items.push("下床、如廁、夜間移位前先按鈴，避免自行站立。");
+  if(d.risks.weakness) items.push("患側肢體需特別保護，移位不可拉扯患側手臂。");
+  if(d.risks.bleed) items.push("服用抗凝血/抗血小板藥時須留意黑便、血尿或異常出血。");
+  if(d.risks.ng || d.hasNG === "有，需衛教") items.push("鼻胃管固定與灌食前後姿勢須確實，避免滑脫與嗆咳。");
+  if(d.risks.foley || d.hasFoley === "有，需衛教") items.push("尿袋需低於膀胱、避免回流與拉扯。");
+  if(d.risks.trach || d.hasTrach === "有，需衛教") items.push("氣切需觀察分泌物、呼吸喘與脫管風險。");
+  if(!items.length) items.push("目前以一般中風照護、復健與規律追蹤為主。");
+  return "<b>本次優先提醒：</b><br>" + items.map(i=>"• "+escapeHtml(i)).join("<br>");
+}
+
+function buildCards(d){
+  return d.topics.map(k=>{
+    const t = topicDefinitions[k];
+    return `<div class="edu-card"><h3>${t.label}</h3><ul>${t.lines.map(line=>`<li>${escapeHtml(line)}</li>`).join("")}</ul></div>`;
+  }).join("");
+}
+
+function buildFamilyLeaflet(d){
+  const lines = [];
+  lines.push("中風後最重要的是安全、規律用藥、復健與警訊觀察。");
+  if(d.risks.dysphagia || d.swallowLevel!=="正常") lines.push("吃東西前請先坐正，若咳嗽、吞不下或常嗆到，請先停止進食。");
+  if(d.risks.fall || d.mobility!=="可自行活動") lines.push("下床、如廁、洗澡前要先有人陪，不要自己急著站起來。");
+  if(d.risks.weakness) lines.push("偏癱側手腳要特別保護，移位時不要拉患側手臂。");
+  if(d.risks.bleed) lines.push("若有黑便、血尿、牙齦出血、大片瘀青，要盡快就醫。");
+  if(d.risks.ng || d.hasNG === "有，需衛教") lines.push("鼻胃管不要自行拉扯，灌食前後要抬高床頭，避免嗆到。");
+  if(d.hasTubeFeeding === "有，需衛教") lines.push("管灌速度不要太快，若腹脹、嘔吐、嗆咳要先暫停。");
+  if(d.risks.foley || d.hasFoley === "有，需衛教") lines.push("尿袋要放低，不要高過膀胱，也不要壓到或拉到尿管。");
+  if(d.risks.trach || d.hasTrach === "有，需衛教") lines.push("氣切要注意呼吸聲、痰量和皮膚狀況，若呼吸喘或脫管要立即求助。");
+  lines.push("若再出現臉歪、手腳無力、說話不清、意識改變，請立刻就醫。");
+  return lines;
+}
+
+function buildFamilyCarePoints(d){
+  const out = [];
+  out.push("按時服藥並依約回診，不可自行停藥。");
+  out.push("居家環境保持通道淨空、浴廁防滑。");
+  if(d.risks.dysphagia || d.swallowLevel!=="正常") out.push("進食時少量慢食，進食後先不要立即平躺。");
+  if(d.risks.weakness) out.push("翻身、移位、下床時要保護患側手腳。");
+  if(d.risks.ng || d.hasNG === "有，需衛教") out.push("鼻胃管固定處需每日觀察，若滑脫或滲漏要回院處理。");
+  if(d.hasTubeFeeding === "有，需衛教") out.push("灌食量、水分與時間依醫囑執行。");
+  if(d.risks.foley || d.hasFoley === "有，需衛教") out.push("尿袋保持低位，觀察尿量、顏色及是否混濁。");
+  if(d.risks.trach || d.hasTrach === "有，需衛教") out.push("觀察痰液顏色、呼吸狀況與氣切周圍皮膚。");
+  return out;
+}
+
+function buildFollow(d){
+  const out = [];
+  if(d.risks.dysphagia || d.swallowLevel !== "正常") out.push("再次確認進食姿勢、飲食型態與嗆咳情形。");
+  if(d.risks.fall || d.mobility !== "可自行活動") out.push("重新評估下床、如廁、夜間安全與家屬陪同狀況。");
+  if(d.risks.weakness) out.push("觀察患側保護與復健配合度。");
+  if(d.risks.bleed) out.push("確認用藥理解度與出血警訊辨識。");
+  if(d.homeReadiness !== "良好") out.push("出院前再確認家屬對居家照護的理解。");
+  if(!out.length) out.push("持續追蹤一般中風照護與門診回診安排。");
+  return out;
+}
+
+function buildTiming(d){
+  const out = [
+    "新收當日完成首次衛教。",
+    "病況穩定轉一般病房或復健前再次加強。",
+    "家屬主要照顧者更換時補充相同內容。",
+    "出院前再次確認返家照護與警訊。"
+  ];
+  if(d.homeReadiness === "高風險，需反覆衛教") out.unshift("建議每日簡短 повтор衛教一次並確認回饋。");
+  return out;
+}
+
+function buildHomeChecklist(d){
+  const out = [
+    "按時服藥，不可自行停藥或漏服。",
+    "維持安全飲食與足夠水分攝取，依醫囑選擇飲食型態。",
+    "居家走道淨空、浴廁防滑，避免再次跌倒。",
+    "依治療師建議持續復健與活動。"
+  ];
+  if(d.risks.dysphagia || d.swallowLevel !== "正常") out.push("進食時坐正，少量慢食，若嗆咳需立即停止。");
+  if(d.risks.weakness) out.push("移位時保護患側肢體，不可硬拉患側手臂。");
+  if(d.risks.bleed) out.push("注意黑便、血尿、牙齦出血或異常瘀青。");
+  return out;
+}
+
+function buildFollowupChecklist(d){
+  const out = [
+    "依約回神經內科 / 神經外科門診追蹤。",
+    "持續監測血壓、血糖、血脂。",
+    "有任何新的神經學症狀，應儘速就醫。"
+  ];
+  if(d.risks.bleed) out.push("回診時主動告知目前使用的抗凝血或抗血小板藥物。");
+  if(d.homeReadiness !== "良好") out.push("必要時可安排個管師、復健或居家照護資源協助。");
+  return out;
+}
+
+
+function buildRehabStageContent(d){
+  const stage = d.rehabStage || "";
+  if(stage.includes("急性期")){
+    return [
+      "以生命徵象穩定、安全擺位、預防吸入性肺炎、跌倒及壓傷為優先。",
+      "開始早期關節活動、翻身與床上活動，避免長期不動造成併發症。",
+      "家屬重點在於觀察警訊、協助安全姿勢與配合醫療團隊安排。"
+    ];
+  }
+  if(stage.includes("恢復期")){
+    return [
+      "依復健計畫逐步增加坐起、轉位、站立與步行訓練，強化功能重建。",
+      "加強偏癱側保護、吞嚥安全、日常生活活動訓練與家屬共同參與。",
+      "持續追蹤疲倦、情緒、吞嚥與活動耐受度，調整復健強度。"
+    ];
+  }
+  if(stage.includes("準備出院期")){
+    return [
+      "以家屬可實際執行為目標，確認移位、進食、管路與如廁照護能力。",
+      "檢查居家環境安全、輔具需求、回診與復健安排是否已清楚。",
+      "重點為建立返家照護流程，降低再住院與跌倒風險。"
+    ];
+  }
+  return [
+    "持續規律復健、服藥與慢性病控制，降低再次中風風險。",
+    "追蹤步態、吞嚥、語言與日常生活功能，依狀況調整目標。",
+    "鼓勵病人與家屬長期參與復健與健康促進。"
+  ];
+}
+
+function buildDischargeChecklist(d){
+  const out = [
+    "已說明中風警訊與異常時就醫時機",
+    "已說明藥物服用方式與不可自行停藥",
+    "已說明血壓 / 血糖 / 血脂控制重要性",
+    "已說明跌倒預防與居家環境安全",
+    "已確認回診日期與復健安排"
+  ];
+  if(d.risks.dysphagia || d.swallowLevel !== "正常") out.push("已說明吞嚥安全與飲食型態");
+  if(d.risks.weakness || d.mobility !== "可自行活動") out.push("已示範移位 / 下床 / 患側保護");
+  if(d.risks.ng || d.hasNG === "有，需衛教") out.push("已說明鼻胃管固定、滑脫與灌食注意事項");
+  if(d.hasTubeFeeding === "有，需衛教") out.push("已說明管灌量、速度、姿勢與不耐受觀察");
+  if(d.risks.foley || d.hasFoley === "有，需衛教") out.push("已說明尿管與尿袋照護");
+  if(d.risks.trach || d.hasTrach === "有，需衛教") out.push("已說明氣切照護與呼吸道警訊");
+  if(d.risks.bleed) out.push("已說明出血警訊與抗凝血 / 抗血小板藥注意事項");
+  return out;
+}
+
+
+function renderQRCode(targetId, textId, link){
+  const box = $(targetId);
+  const text = $(textId);
+  if(!box) return;
+  box.innerHTML = "";
+  const finalLink = (link && link.trim()) ? link.trim() : window.location.href;
+  if(text) text.textContent = finalLink;
+  if(typeof QRCode !== "undefined"){
+    new QRCode(box, {
+      text: finalLink,
+      width: 104,
+      height: 104
+    });
+  } else {
+    box.innerHTML = '<div style="font-size:12px;color:#64748b;text-align:center;padding:8px">QR library 載入失敗</div>';
+  }
+}
+
+function generateAll(){
+  const d = collectData();
+  const risks = riskLabels(d.risks);
+  const auto = autoRecommendations(d);
+
+  $("previewBadges").innerHTML = [
+    badge("床號 " + escapeHtml(d.bedNumber || "-")),
+    badge("病歷號 " + escapeHtml(d.mrn || "-")),
+    badge(escapeHtml(d.patientName || "未填姓名")),
+    badge(typeLabel(d.strokeType)),
+    badge(escapeHtml(d.careStage)),
+    badge("共 " + d.topics.length + " 項衛教")
+  ].join("");
+  $("introText").innerHTML = previewIntro(d, risks);
+  $("priorityBox").innerHTML = buildPriorityText(d);
+  $("previewCards").innerHTML = buildCards(d);
+  $("rehabStageContent").innerHTML = buildRehabStageContent(d).map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+  $("noteBox").innerHTML = "<b>護理備註：</b>" + (d.note ? escapeHtml(d.note) : "無");
+  renderQRCode("qrPreview", "qrPreviewText", d.qrLink);
+  renderQRCode("qrDischarge", "qrDischargeText", d.qrLink);
+  $("printMetaTop").innerHTML = [
+    `姓名：${escapeHtml(d.patientName || "-")}`,
+    `床號：${escapeHtml(d.bedNumber || "-")}`,
+    `病歷號：${escapeHtml(d.mrn || "-")}`,
+    `診斷：${escapeHtml(d.diagnosis || "-")}`,
+    `護理師：${escapeHtml(d.educator || "-")}`
+  ].map(x=>`<span>${x}</span>`).join("");
+  if(auto.length){
+    $("noteBox").innerHTML += "<br><br><b>系統建議：</b><br>" + auto.map(x=>"• "+escapeHtml(x)).join("<br>");
+  }
+
+  $("familyBadges").innerHTML = [
+    badge(escapeHtml(d.audience)),
+    badge(escapeHtml(d.language)),
+    badge(escapeHtml(d.caregiver || "未填照顧者")),
+    badge("一鍵家屬單張")
+  ].join("");
+  $("familyLeaflet").innerHTML = buildFamilyLeaflet(d).map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+  $("familyCarePoints").innerHTML = buildFamilyCarePoints(d).map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+  $("familyDanger").innerHTML = "<b>家屬務必留意以下警訊：</b><br>• 臉歪、手腳突然無力<br>• 說話不清、叫不太醒<br>• 持續嗆咳、吞不下、反覆嘔吐<br>• 呼吸喘、血氧下降、痰很多或氣切脫管<br>• 黑便、血尿、異常出血<br><br><b>以上任一情形請立即就醫或尋求醫護協助。</b>";
+
+  $("summaryRiskBadges").innerHTML = risks.length ? risks.map(r=>badge(escapeHtml(r))).join("") : badge("一般照護");
+  $("sumName").textContent = d.patientName || "-";
+  $("sumBed").textContent = d.bedNumber || "-";
+  $("sumDx").textContent = d.diagnosis || "-";
+  $("sumStage").textContent = d.careStage || "-";
+  $("sumRehabStage").textContent = d.rehabStage || "-";
+  $("sumCaregiver").textContent = d.caregiver || "-";
+  $("sumEducator").textContent = d.educator || "-";
+  $("summaryTopics").innerHTML = d.topics.map(k=>`<li>${escapeHtml(topicDefinitions[k].label)}</li>`).join("") || "<li>尚未勾選</li>";
+  $("summaryFollow").innerHTML = buildFollow(d).map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+  $("summaryTiming").innerHTML = buildTiming(d).map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+
+  $("dischargeBadges").innerHTML = [
+    badge("出院前重點"),
+    badge(escapeHtml(d.audience)),
+    badge(escapeHtml(d.homeReadiness))
+  ].join("");
+  $("printMetaDischarge").innerHTML = [
+    `姓名：${escapeHtml(d.patientName || "-")}`,
+    `床號：${escapeHtml(d.bedNumber || "-")}`,
+    `病歷號：${escapeHtml(d.mrn || "-")}`,
+    `照顧者：${escapeHtml(d.caregiver || "-")}`,
+    `護理師：${escapeHtml(d.educator || "-")}`
+  ].map(x=>`<span>${x}</span>`).join("");
+  $("dangerSigns").innerHTML = "<b>返家警訊：</b><br>• 臉歪、手腳突然無力<br>• 說話不清、理解變差<br>• 劇烈頭痛、抽搐或意識改變<br>• 持續嗆咳、吞不下或反覆跌倒<br><br><b>以上任一情形請立即就醫。</b>";
+  $("dischargeChecklistPrint").innerHTML = buildDischargeChecklist(d).map(x=>`<div class="check-item-print"><span class="box"></span><span>${escapeHtml(x)}</span></div>`).join("");
+  $("homeChecklist").innerHTML = buildHomeChecklist(d).map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+  $("followupChecklist").innerHTML = buildFollowupChecklist(d).map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+
+  $("status").style.display = "block";
+}
+
+function switchTab(name, btn){
+  ["preview","family","summary","discharge"].forEach(id => {
+    $("tab-"+id).classList.toggle("hidden", id!==name);
+  });
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function saveDraft(){
+  localStorage.setItem("strokeEduProDraft", JSON.stringify(collectData()));
+  $("status").style.display = "block";
+  $("status").textContent = "已儲存到這台電腦的瀏覽器草稿。";
+}
+
+function loadDraft(){
+  const raw = localStorage.getItem("strokeEduProDraft");
+  if(!raw){
+    $("status").style.display = "block";
+    $("status").textContent = "找不到已儲存草稿。";
+    return;
+  }
+  const d = JSON.parse(raw);
+  $("patientName").value = d.patientName || "";
+  $("bedNumber").value = d.bedNumber || "";
+  $("mrn").value = d.mrn || "";
+  $("educator").value = d.educator || "";
+  $("audience").value = d.audience || "病人與家屬";
+  $("language").value = d.language || "中文";
+  $("diagnosis").value = d.diagnosis || "";
+  $("qrLink").value = d.qrLink || "";
+  $("careStage").value = d.careStage || "住院初期";
+  $("swallowLevel").value = d.swallowLevel || "正常";
+  $("mobility").value = d.mobility || "可自行活動";
+  $("rehabStage").value = d.rehabStage || "恢復期：開始規律復健與功能重建";
+  $("communication").value = d.communication || "可清楚表達";
+  $("caregiver").value = d.caregiver || "";
+  $("homeReadiness").value = d.homeReadiness || "良好";
+  $("hasNG").value = d.hasNG || "無";
+  $("hasTubeFeeding").value = d.hasTubeFeeding || "無";
+  $("hasFoley").value = d.hasFoley || "無";
+  $("hasTrach").value = d.hasTrach || "無";
+  $("note").value = d.note || "";
+  $("riskWeakness").checked = !!d.risks.weakness;
+  $("riskDysphagia").checked = !!d.risks.dysphagia;
+  $("riskAphasia").checked = !!d.risks.aphasia;
+  $("riskMental").checked = !!d.risks.mental;
+  $("riskFall").checked = !!d.risks.fall;
+  $("riskPressure").checked = !!d.risks.pressure;
+  $("riskTube").checked = !!d.risks.tube;
+  $("riskBleed").checked = !!d.risks.bleed;
+  $("riskNG").checked = !!d.risks.ng;
+  $("riskFoley").checked = !!d.risks.foley;
+  $("riskTrach").checked = !!d.risks.trach;
+  applyPreset(d.strokeType || "ischemic");
+  Object.keys(topicDefinitions).forEach(k => {
+    $("topic-"+k).checked = (d.topics || []).includes(k);
+  });
+  generateAll();
+  $("status").style.display = "block";
+  $("status").textContent = "已載入先前草稿。";
+}
+
+function resetForm(){
+  $("patientName").value = "王小明";
+  $("bedNumber").value = "5D-12";
+  $("mrn").value = "12345678";
+  $("educator").value = "護理師子芸";
+  $("audience").value = "病人與家屬";
+  $("language").value = "中文";
+  $("diagnosis").value = "右側缺血性腦中風";
+  $("qrLink").value = "";
+  $("careStage").value = "住院初期";
+  $("swallowLevel").value = "疑似吞嚥困難";
+  $("mobility").value = "需協助移位/下床";
+  $("rehabStage").value = "恢復期：開始規律復健與功能重建";
+  $("communication").value = "可清楚表達";
+  $("caregiver").value = "配偶";
+  $("homeReadiness").value = "需再加強";
+  $("hasNG").value = "無";
+  $("hasTubeFeeding").value = "無";
+  $("hasFoley").value = "無";
+  $("hasTrach").value = "無";
+  $("note").value = "病人左側無力、需協助下床，家屬主要照顧者已在旁學習。出院前需再加強吞嚥安全與居家防跌。";
+  $("riskWeakness").checked = true;
+  $("riskDysphagia").checked = true;
+  $("riskAphasia").checked = false;
+  $("riskMental").checked = false;
+  $("riskFall").checked = true;
+  $("riskPressure").checked = false;
+  $("riskTube").checked = false;
+  $("riskBleed").checked = false;
+  $("riskNG").checked = false;
+  $("riskFoley").checked = false;
+  $("riskTrach").checked = false;
+  applyPreset("ischemic");
+  generateAll();
+}
+
+renderTopicArea();
+["patientName","bedNumber","mrn","educator","audience","language","diagnosis","qrLink","careStage","swallowLevel","mobility","rehabStage","communication","caregiver","homeReadiness","note","hasNG","hasTubeFeeding","hasFoley","hasTrach",
+"riskWeakness","riskDysphagia","riskAphasia","riskMental","riskFall","riskPressure","riskTube","riskBleed","riskNG","riskFoley","riskTrach"].forEach(id=>{
+  const el = $(id);
+  if(el){
+    el.addEventListener("change", ()=>{
+      if(id==="hasNG" && el.value==="有，需衛教"){ $("riskNG").checked = true; $("topic-ngtube").checked = true; }
+      if(id==="hasTubeFeeding" && el.value==="有，需衛教"){ $("topic-tubeFeeding").checked = true; }
+      if(id==="hasFoley" && el.value==="有，需衛教"){ $("riskFoley").checked = true; $("topic-foley").checked = true; }
+      if(id==="hasTrach" && el.value==="有，需衛教"){ $("riskTrach").checked = true; $("topic-trach").checked = true; }
+      generateAll();
+    });
+    if(el.tagName==="INPUT" || el.tagName==="TEXTAREA"){ el.addEventListener("input", generateAll); }
+  }
+});
+applyPreset("ischemic");
+generateAll();
+</script>
+</body>
+</html>
