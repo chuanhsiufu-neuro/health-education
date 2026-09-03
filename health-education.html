@@ -154,7 +154,9 @@
   </div>
 
   <script>
-    // 自動連動勾選邏輯 (Auto-mapping)
+    // ▼▼▼ 請將引號內替換為你最終部署好的 GAS 網址 ▼▼▼
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzgpOvrh4ngXlizY69Gp_i_YzHwD2uivVmKUqRCxSVF8PC8_sPi6lbEfa4Q4uahaaB0/exec'; 
+
     function autoMap() {
       const isSmoking = document.getElementById('chkSmoking').checked;
       const isAntiCoag = document.getElementById('chkAntiCoag').checked;
@@ -170,9 +172,8 @@
       document.getElementById('needRehab').checked = (isWeakness || isDysphagia || isAphasia || isUnsteady);
     }
 
-    // 處理表單送出
     function submitForm(event) {
-      event.preventDefault(); // 避免網頁重新載入
+      event.preventDefault(); 
       
       const formData = {
         lastName: document.getElementById('lastName').value,
@@ -199,44 +200,32 @@
       const submitBtn = document.querySelector('.btn-submit');
       const originalText = submitBtn.innerText;
       
-      // 改變按鈕狀態，防止重複點擊
-      submitBtn.innerText = '處理中，請稍候...';
+      submitBtn.innerText = '連線處理中，請稍候...';
       submitBtn.disabled = true;
       submitBtn.style.backgroundColor = '#7f8c8d';
 
-      // 檢查是否在 GAS 環境下執行
-      if (typeof google !== 'undefined' && google.script) {
-        google.script.run
-          .withSuccessHandler(function(response) {
-            alert(response); 
-            document.getElementById('patientForm').reset(); 
-            submitBtn.innerText = originalText;
-            submitBtn.disabled = false;
-            submitBtn.style.backgroundColor = '#27ae60';
-          })
-          .withFailureHandler(function(error) {
-            alert("發生錯誤，請聯絡管理員：" + error.message);
-            submitBtn.innerText = originalText;
-            submitBtn.disabled = false;
-            submitBtn.style.backgroundColor = '#27ae60';
-          })
-          .processNewPatient(formData);
-      } else {
-         // 在一般瀏覽器開啟時的預設本機測試行為
-         console.log("即將送出的資料：", formData);
-         alert(`【本機測試模式】
-
-表單資料收集完成：
-床號：${formData.bedNumber}
-個案：${formData.lastName}OO
-需求：${formData.needs.join(', ')}
-
-(若部署至 Google Apps Script，此時將觸發推播)`);
-         document.getElementById('patientForm').reset(); 
-         submitBtn.innerText = originalText;
-         submitBtn.disabled = false;
-         submitBtn.style.backgroundColor = '#27ae60';
-      }
+      // 跨網域 API 呼叫 (發送給 GAS)
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        // 打包資料並加上 source 標記，讓後端辨識這不是 LINE 的訊息
+        body: JSON.stringify({ source: 'web_form', data: formData }) 
+      })
+      .then(response => response.text())
+      .then(result => {
+        alert("新增成功！已通知相關職類。"); 
+        document.getElementById('patientForm').reset(); 
+      })
+      .catch(error => {
+        alert("發生錯誤，請聯絡管理員：" + error.message);
+      })
+      .finally(() => {
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
+        submitBtn.style.backgroundColor = '#27ae60';
+      });
     }
   </script>
 </body>
