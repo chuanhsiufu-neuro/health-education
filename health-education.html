@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>跨團隊中風個案推播系統</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7f6;
+      color: #333;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    .section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f9fbfd;
+      border: 1px solid #e1e8ed;
+      border-radius: 6px;
+    }
+    .section-title {
+      font-weight: 600;
+      font-size: 1.1em;
+      color: #2980b9;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #2980b9;
+      display: inline-block;
+      padding-bottom: 3px;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+    .form-group input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+      cursor: pointer;
+    }
+    .checkbox-group input[type="checkbox"], 
+    .checkbox-group input[type="radio"] {
+      margin-right: 6px;
+      transform: scale(1.2);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .btn-submit:hover {
+      background-color: #219150;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>📢 中風個案跨團隊推播</h2>
+    <form id="patientForm" onsubmit="submitForm(event)">
+      
+      <div class="section">
+        <div class="section-title">一、 基本資訊</div>
+        <div class="form-group">
+          <label for="lastName">個案姓氏 (如：陳)</label>
+          <input type="text" id="lastName" name="lastName" placeholder="輸入姓氏即可" required>
+        </div>
+        <div class="form-group">
+          <label for="bedNumber">床號</label>
+          <input type="text" id="bedNumber" name="bedNumber" placeholder="如：5A-01" required>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">二、 臨床資訊與特徵</div>
+        
+        <div class="form-group">
+          <label>中風類型：</label>
+          <div class="checkbox-group">
+            <label><input type="radio" name="strokeType" value="缺血性" required> 缺血性 (Ischemic)</label>
+            <label><input type="radio" name="strokeType" value="出血性" required> 出血性 (Hemorrhagic)</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>病史/用藥 (可複選)：</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="chkSmoking" value="抽菸" onchange="autoMap()"> 抽菸</label>
+            <label><input type="checkbox" id="chkAntiCoag" value="抗凝血劑" onchange="autoMap()"> 使用抗凝血劑</label>
+            <label><input type="checkbox" id="chkDiabetes" value="糖尿病" onchange="autoMap()"> 糖尿病</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>臨床症狀 (可複選)：</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="chkWeakness" value="無力" onchange="autoMap()"> 無力</label>
+            <label><input type="checkbox" id="chkDysphagia" value="吞嚥困難" onchange="autoMap()"> 吞嚥困難</label>
+            <label><input type="checkbox" id="chkAphasia" value="失語" onchange="autoMap()"> 失語</label>
+            <label><input type="checkbox" id="chkUnsteady" value="步態不穩" onchange="autoMap()"> 步態不穩</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">三、 建議衛教職類 (自動帶入/可手動微調)</div>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="needRehab" name="needs" value="復健"> 1. 復健</label>
+          <label><input type="checkbox" id="needNutrition" name="needs" value="營養"> 2. 營養</label>
+          <label><input type="checkbox" id="needPharmacy" name="needs" value="藥事"> 3. 藥事</label>
+          <label><input type="checkbox" id="needSmokeQuit" name="needs" value="戒菸"> 4. 戒菸衛教</label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">送出並建立新個案推播</button>
+
+    </form>
+  </div>
+
+  <script>
+    // 自動連動勾選邏輯 (Auto-mapping)
+    function autoMap() {
+      const isSmoking = document.getElementById('chkSmoking').checked;
+      const isAntiCoag = document.getElementById('chkAntiCoag').checked;
+      const isDiabetes = document.getElementById('chkDiabetes').checked;
+      const isWeakness = document.getElementById('chkWeakness').checked;
+      const isDysphagia = document.getElementById('chkDysphagia').checked;
+      const isAphasia = document.getElementById('chkAphasia').checked;
+      const isUnsteady = document.getElementById('chkUnsteady').checked;
+
+      document.getElementById('needSmokeQuit').checked = isSmoking;
+      document.getElementById('needPharmacy').checked = isAntiCoag;
+      document.getElementById('needNutrition').checked = (isDysphagia || isDiabetes);
+      document.getElementById('needRehab').checked = (isWeakness || isDysphagia || isAphasia || isUnsteady);
+    }
+
+    // 處理表單送出
+    function submitForm(event) {
+      event.preventDefault(); // 避免網頁重新載入
+      
+      const formData = {
+        lastName: document.getElementById('lastName').value,
+        bedNumber: document.getElementById('bedNumber').value,
+        strokeType: document.querySelector('input[name="strokeType"]:checked').value,
+        features: [],
+        needs: []
+      };
+
+      const features = ['chkSmoking', 'chkAntiCoag', 'chkDiabetes', 'chkWeakness', 'chkDysphagia', 'chkAphasia', 'chkUnsteady'];
+      features.forEach(id => {
+        const el = document.getElementById(id);
+        if (el.checked) formData.features.push(el.value);
+      });
+
+      const needsElements = document.querySelectorAll('input[name="needs"]:checked');
+      needsElements.forEach(el => formData.needs.push(el.value));
+
+      if (formData.needs.length === 0) {
+        alert("請至少選擇一項衛教需求！");
+        return;
+      }
+
+      const submitBtn = document.querySelector('.btn-submit');
+      const originalText = submitBtn.innerText;
+      
+      // 改變按鈕狀態，防止重複點擊
+      submitBtn.innerText = '處理中，請稍候...';
+      submitBtn.disabled = true;
+      submitBtn.style.backgroundColor = '#7f8c8d';
+
+      // 檢查是否在 GAS 環境下執行
+      if (typeof google !== 'undefined' && google.script) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            alert(response); 
+            document.getElementById('patientForm').reset(); 
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+            submitBtn.style.backgroundColor = '#27ae60';
+          })
+          .withFailureHandler(function(error) {
+            alert("發生錯誤，請聯絡管理員：" + error.message);
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+            submitBtn.style.backgroundColor = '#27ae60';
+          })
+          .processNewPatient(formData);
+      } else {
+         // 在一般瀏覽器開啟時的預設本機測試行為
+         console.log("即將送出的資料：", formData);
+         alert(`【本機測試模式】
+
+表單資料收集完成：
+床號：${formData.bedNumber}
+個案：${formData.lastName}OO
+需求：${formData.needs.join(', ')}
+
+(若部署至 Google Apps Script，此時將觸發推播)`);
+         document.getElementById('patientForm').reset(); 
+         submitBtn.innerText = originalText;
+         submitBtn.disabled = false;
+         submitBtn.style.backgroundColor = '#27ae60';
+      }
+    }
+  </script>
+</body>
+</html>
